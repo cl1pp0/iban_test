@@ -3,21 +3,29 @@
 #include <string.h>
 #include <ctype.h>
 
+#define IBAN_LEN 34
+
 int test_iban(char *iban)
 {
     int res = 0, buf_idx = 0;
     mpz_t iban_mpi, rem;
 
-    /* max IBAN length is 34, +2 for country code to number , +1 for null byte */
-    char iban_buf[37] = {0};
+    /*  34 is max IBAN length is
+        +2 for country code to number conversion
+        +1 for null termination byte
+      = 37 string length */
+    char iban_buf[IBAN_LEN+3] = {0};
 
     /* first 4 bytes must follow schema AADD */
-    if (isalpha(iban[0]) && isalpha(iban[1]) && isdigit(iban[2]) && isdigit(iban[3]))
+    if (   isalpha(iban[0])
+        && isalpha(iban[1])
+        && isdigit(iban[2])
+        && isdigit(iban[3]) )
     {
         /* are remaining chars digits? -> copy them to buffer */
         for (int i = 4; iban[i] != '\0'; i++)
         {
-            if (i < 34)
+            if (i < IBAN_LEN)
             {
                 if (isdigit(iban[i]))
                 {
@@ -35,7 +43,6 @@ int test_iban(char *iban)
                 res = 4;
                 break;
             }
-            
         }
 
         if (!res)
@@ -68,11 +75,13 @@ int test_iban(char *iban)
                 //gmp_printf("rem %Zd\n", rem);
                 if (mpz_cmp_ui(rem, 1))
                     res = 2;
+                mpz_clear(rem);
             }
             else
             {
                 res = 3;
             }
+            mpz_clear(iban_mpi);
         }
     }
     else /* if (isalpha(iban[0]) && isalpha(iban[1]) && isdigit(iban[2]) && isdigit(iban[3])) */
