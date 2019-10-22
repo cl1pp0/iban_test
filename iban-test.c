@@ -10,10 +10,10 @@ int test_iban(char *iban)
     int res = 0, buf_idx = 0;
     mpz_t iban_mpi, rem;
 
-    /*  34 is max IBAN length is
+    /*  34 is max IBAN length
         +2 for country code to number conversion
         +1 for null termination byte
-      = 37 string length */
+      = 37 max string length */
     char iban_buf[IBAN_LEN+3] = {0};
 
     /* first 4 bytes must follow schema AADD */
@@ -63,7 +63,6 @@ int test_iban(char *iban)
             /* copy checksum to buffer */
             iban_buf[buf_idx] = iban[2];
             iban_buf[++buf_idx] = iban[3];
-
             //printf("iban_buf %s\n", iban_buf);
 
             /* covert buffer to large integer and check if (N mod 97) == 1 */
